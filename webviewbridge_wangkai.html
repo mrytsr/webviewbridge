@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>测试CPA手机函数</title>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
+
+</head>
+
+<body>
+
+
+<div class="main">
+	安卓3003 APP： <font class="is3003">否</font><br />
+	IOS 2003 APP： <font class="is2003">否</font><br /><br />
+	task_device： <font class="task_device"></font><br />
+	device_id： <font class="device_id"></font><br />
+	mac： <font class="mac"></font><br />
+	idfa： <font class="idfa"></font><br />
+	token： <font class="token"></font><br />
+	caller： <font class="caller"></font><br />
+	prd_ver： <font class="prd_ver"></font><br />
+	market_channel_id： <font class="market_channel_id"></font><br />
+	osVersion： <font class="osVersion"></font><br />
+</div>
+
+
+
+</body>
+</html>
+
+
+
+<script>
+alert('开始测试');
+
+
+var task_device = '';
+var device_id = '';
+var mac = '';
+var idfa = '';
+var token = '';
+var caller = '';
+var prd_ver = '';
+var market_channel_id = '';
+var osVersion = '';
+
+
+
+//判定是否在听听安卓版
+function isInilistenAndroid(){
+	var browserName=navigator.userAgent.toLowerCase();  
+    if(/ilisten_android_3003/i.test(browserName)){  
+		return true;
+	}else{
+		return false;
+	}
+}
+
+//判定是否在听听ios版
+function isInilistenIos(){
+    return true;
+	// var browserName=navigator.userAgent.toLowerCase();  
+    // if(/ilisten_ios_2003/i.test(browserName)){  
+	// 	return true;
+	// }else{
+	// 	return false;
+	// }
+}
+
+
+
+
+	
+//如果是安卓听听
+if(isInilistenAndroid()){
+	$('.is3003').html('是');
+	var MsgObjStr = window.ilisten.getDeviceInfo();
+	var MsgObj = eval('(' + MsgObjStr + ')');
+	
+	task_device = MsgObj.task_device;
+	token		= MsgObj.token;
+	caller 		= MsgObj.caller;
+	prd_ver 	= MsgObj.prd_ver;
+	market_channel_id  = MsgObj.channel_id;
+	device_id 	= MsgObj.device_id;
+	
+	$('.token').html(token);
+	$('.task_device').html(task_device);
+	$('.caller').html(caller);
+	$('.prd_ver').html(prd_ver);
+	$('.market_channel_id').html(market_channel_id);
+	$('.device_id').html(device_id);
+
+}
+
+//如果是IOS听听
+if(isInilistenIos()){
+	$('.is2003').html('是');
+	/**
+	*	调用IOS函数
+	**/
+	function connectWebViewJavascriptBridge(callback) {
+		if (window.WebViewJavascriptBridge) {
+			callback(WebViewJavascriptBridge);
+		} else {
+			document.addEventListener('WebViewJavascriptBridgeReady', function() {
+				callback(WebViewJavascriptBridge);
+			}, false);
+		}
+	}
+
+	connectWebViewJavascriptBridge(function(bridge) {
+		//调用初始化函数，取消队列，使消息能够得到直接处理
+		bridge.init(function(message, responseCallback) {
+            alert('fdf');
+			var data = { 'Javascript Responds':'Wee!' } ;
+			task_device = message.task_device;
+			token		= message.token;
+			caller 		= message.caller;
+			prd_ver 	= message.prd_ver;
+			market_channel_id  = message.channel_id;
+			device_id 	= message.device_id;
+			idfa 		= message.idfa;
+			mac			= message.mac;
+			osVersion	= message.osVersion;
+			
+			$('.token').html(token);
+			$('.task_device').html(task_device);
+			$('.caller').html(caller);
+			$('.prd_ver').html(prd_ver);
+			$('.market_channel_id').html(market_channel_id);
+			$('.device_id').html(device_id);
+			$('.idfa').html(idfa);
+			$('.osVersion').html(osVersion);
+			$('.mac').html(mac);
+			$('.idfa').html(idfa);
+			
+			responseCallback(data);
+		});
+	
+		
+	});
+
+}
+
+</script>

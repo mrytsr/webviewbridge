@@ -1,0 +1,56 @@
+<script>
+function connectWebViewJavascriptBridge(callback) {
+    if (window.WebViewJavascriptBridge) {
+        callback(WebViewJavascriptBridge);
+    } else {
+        document.addEventListener('WebViewJavascriptBridgeReady', function() {callback(WebViewJavascriptBridge);}, false);
+    }
+}
+connectWebViewJavascriptBridge(function(bridge) {
+    // 这个init方法虽然什么都不做,但是一定要存在
+    bridge.init(function(message, responseCallback) { })
+    bridge.send('func_exists#open_window', function(responseData) {
+        if(responseData == '1'){
+            if(typeof window.ilisten != 'object'){
+                window.ilisten = {}
+            }
+            window.ilisten.open_window = function(url){
+                bridge.callHandler('open_window', url, function(response) { });
+            }
+        }
+    })
+    bridge.send('func_exists#getDeviceInfo', function(responseData) {
+        if(responseData == '1'){
+            if(typeof window.ilisten != 'object'){
+                window.ilisten = {}
+            }
+            window.ilisten.getDeviceInfo = function(response_callback){
+                bridge.callHandler('getDeviceInfo', null, response_callback);
+            }
+        }
+    })
+
+});
+function open_window(url){
+    if(typeof window.ilisten == 'object' && typeof window.ilisten.open_window == 'function'){
+        window.ilisten.open_window(url);
+    }else{
+        window.location = url;
+    }
+}
+function fullscreen_current(){
+    if(typeof window.ilisten == 'object' && typeof window.ilisten.fullscreen_current == 'function'){
+        window.ilisten.fullscreen_current();
+    }
+}
+function getDeviceInfo(){
+    if(typeof window.ilisten == 'object' && typeof window.ilisten.getDeviceInfo == 'function'){
+        window.ilisten.getDeviceInfo(function(responseData){
+            alert(responseData);
+        });
+    }
+}
+</script>
+<h1><a href="javascript:void(0)" onclick="open_window(this.attributes['url'].value)" url="http://baidu.com">open_window</a></h1>
+<h1><a href="javascript:void(0)" onclick="fullscreen_current()">fullscreen_current</a></h1>
+<h1><a href="javascript:void(0)" onclick="getDeviceInfo()" >getDeviceInfo</a></h1>
